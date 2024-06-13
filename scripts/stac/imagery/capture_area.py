@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 from linz_logger import get_log
 from shapely import BufferCapStyle, BufferJoinStyle, Geometry, to_geojson, union_all
 from shapely.geometry import Polygon
+from shapely.geometry.polygon import orient
 
 from scripts.logging.time_helper import time_in_ms
 
@@ -75,7 +76,7 @@ def merge_polygons(polygons: List[Polygon], buffer_distance: float) -> Geometry:
     union_buffered = union_all(buffered_polygons)
     # Negative buffer back in the polygons
     union_unbuffered = union_buffered.buffer(-buffer_distance, cap_style=BufferCapStyle.flat, join_style=BufferJoinStyle.mitre)
-    union_simplified = union_unbuffered.simplify(buffer_distance)
+    union_simplified = orient(union_unbuffered.simplify(buffer_distance), 1.0)
 
     return union_simplified
 
